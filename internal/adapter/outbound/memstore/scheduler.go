@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"sync"
 	"task-manager/internal/application/port/out"
+	"task-manager/internal/common/logger"
 	"task-manager/internal/domain"
 	"time"
 )
@@ -34,9 +35,11 @@ func (s *TaskScheduler) Schedule(_ context.Context, id domain.TaskID) {
 	go func() {
 		task, err := s.repo.Find(ctxTask, id)
 		if err != nil {
+			logger.Error("task not found", "id", id, "error", err)
 			return
 		}
 		if err := task.Start(); err != nil {
+			logger.Error("failed to start task", "id", id, "error", err)
 			return
 		}
 		s.repo.Save(ctxTask, task)
@@ -46,6 +49,7 @@ func (s *TaskScheduler) Schedule(_ context.Context, id domain.TaskID) {
 		case <-time.After(delay):
 			t2, err := s.repo.Find(ctxTask, id)
 			if err != nil {
+				logger.Error("task not found after delay", "id", id, "error", err)
 				return
 			}
 			_ = t2.Complete(string(domain.Success))
@@ -54,6 +58,7 @@ func (s *TaskScheduler) Schedule(_ context.Context, id domain.TaskID) {
 		case <-ctxTask.Done():
 			t2, err := s.repo.Find(context.Background(), id)
 			if err != nil {
+				logger.Error("task not found on cancel", "id", id, "error", err)
 				return
 			}
 			_ = t2.Cancel()

@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"task-manager/internal/application/port/in"
 	"task-manager/internal/application/port/out"
+	"task-manager/internal/common/logger"
 	"task-manager/internal/domain"
 	"time"
 )
@@ -23,6 +24,7 @@ func (h *CreateTaskHandler) Handle(ctx context.Context, cmd in.CreateTaskCommand
 	task := domain.NewTask(id)
 
 	if err := h.repo.Save(ctx, task); err != nil {
+		logger.Error("CreateTask failed: %v", err)
 		return "", err
 	}
 

@@ -6,6 +6,7 @@ import (
 	"strings"
 	"task-manager/internal/application/port/in"
 	"task-manager/internal/common/errors"
+	"task-manager/internal/common/logger"
 	"task-manager/internal/domain"
 	"time"
 )
@@ -33,6 +34,8 @@ func NewTaskHandler(
 func (h *TaskHandler) handleTasks(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
+	start := time.Now()
+	logger.Info("Incoming %s %s", r.Method, r.URL.Path)
 	switch r.Method {
 	case http.MethodPost:
 		h.handleCreate(w, r)
@@ -41,10 +44,14 @@ func (h *TaskHandler) handleTasks(w http.ResponseWriter, r *http.Request) {
 	default:
 		http.Error(w, `{"error":"method not allowed"}`, http.StatusMethodNotAllowed)
 	}
+	logger.Info("Handled %s %s in %s", r.Method, r.URL.Path, time.Since(start))
 }
 
 func (h *TaskHandler) handleTaskByID(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+
+	start := time.Now()
+	logger.Info("Incoming %s %s", r.Method, r.URL.Path)
 
 	id := strings.TrimPrefix(r.URL.Path, "/tasks/")
 	if id == "" {
@@ -60,6 +67,7 @@ func (h *TaskHandler) handleTaskByID(w http.ResponseWriter, r *http.Request) {
 	default:
 		http.Error(w, `{"error":"method not allowed"}`, http.StatusMethodNotAllowed)
 	}
+	logger.Info("Handled %s %s in %s", r.Method, r.URL.Path, time.Since(start))
 }
 
 func (h *TaskHandler) handleCreate(w http.ResponseWriter, r *http.Request) {
