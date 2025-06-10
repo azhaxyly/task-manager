@@ -14,7 +14,7 @@ type TaskDTO struct {
 	ID        domain.TaskID `json:"id"`
 	Status    domain.Status `json:"status"`
 	CreatedAt time.Time     `json:"created_at"`
-	Duration  time.Duration `json:"duration"`
+	Duration  string        `json:"duration"`
 	Result    *string       `json:"result,omitempty"`
 	Error     *string       `json:"error,omitempty"`
 }

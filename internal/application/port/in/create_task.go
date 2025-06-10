@@ -5,7 +5,6 @@ import (
 	"task-manager/internal/domain"
 )
 
-// TODO: пока хз
 type CreateTaskCommand struct{}
 
 type CreateTaskUseCase interface {

@@ -71,7 +71,6 @@ func (t *Task) Cancel() error {
 	return nil
 }
 
-// в наносеках
 func (t *Task) Duration() time.Duration {
 	if t.StartedAt == nil {
 		return 0

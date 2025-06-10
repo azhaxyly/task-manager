@@ -2,9 +2,11 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"task-manager/internal/application/port/in"
 	"task-manager/internal/application/port/out"
 	"task-manager/internal/common/logger"
+	"time"
 )
 
 type GetTaskHandler struct {
@@ -21,11 +23,17 @@ func (h *GetTaskHandler) Handle(ctx context.Context, q in.GetTaskQuery) (in.Task
 		logger.Error("GetTask failed: %v", err)
 		return in.TaskDTO{}, err
 	}
+
+	raw := t.Duration().Truncate(time.Second)
+	mins := int(raw / time.Minute)
+	secs := int((raw % time.Minute) / time.Second)
+	formatted := fmt.Sprintf("%dm%ds", mins, secs)
+
 	return in.TaskDTO{
 		ID:        t.ID,
 		Status:    t.Status,
 		CreatedAt: t.CreatedAt,
-		Duration:  t.Duration(),
+		Duration:  formatted,
 		Result:    t.Result,
 		Error:     t.Err,
 	}, nil
