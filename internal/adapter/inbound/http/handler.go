@@ -3,6 +3,7 @@ package http
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 	"task-manager/internal/application/port/in"
 	"task-manager/internal/domain"
 )
@@ -44,3 +45,26 @@ func (h *TaskHandler) handleTasks(w http.ResponseWriter, r *http.Request) {
 		"status": domain.Pending,
 	})
 }
+
+func (h *TaskHandler) handleTaskByID(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	id := strings.TrimPrefix(r.URL.Path, "/tasks/")
+	if id == "" {
+		http.Error(w, `{"error":"missing task id"}`, http.StatusBadRequest)
+		return
+	}
+
+	switch r.Method {
+	case http.MethodGet:
+		h.handleGet(w, r, domain.TaskID(id))
+	case http.MethodDelete:
+		h.handleDelete(w, r, domain.TaskID(id))
+	default:
+		http.Error(w, `{"error":"method not allowed"}`, http.StatusMethodNotAllowed)
+	}
+}
+
+func (h *TaskHandler) handleGet(w http.ResponseWriter, r *http.Request, id domain.TaskID) {}
+
+func (h *TaskHandler) handleDelete(w http.ResponseWriter, r *http.Request, id domain.TaskID) {}
