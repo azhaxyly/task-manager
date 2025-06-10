@@ -2,25 +2,28 @@ package service
 
 import (
 	"context"
-	"strconv"
 	"task-manager/internal/application/port/in"
 	"task-manager/internal/application/port/out"
 	"task-manager/internal/common/logger"
 	"task-manager/internal/domain"
-	"time"
 )
 
 type CreateTaskHandler struct {
 	repo      out.TaskRepository
 	scheduler out.TaskScheduler
+	idGen     out.IDGenerator
 }
 
-func NewCreateTaskHandler(repo out.TaskRepository, scheduler out.TaskScheduler) *CreateTaskHandler {
-	return &CreateTaskHandler{repo: repo, scheduler: scheduler}
+func NewCreateTaskHandler(
+	repo out.TaskRepository,
+	scheduler out.TaskScheduler,
+	idGen out.IDGenerator,
+) *CreateTaskHandler {
+	return &CreateTaskHandler{repo: repo, scheduler: scheduler, idGen: idGen}
 }
 
 func (h *CreateTaskHandler) Handle(ctx context.Context, cmd in.CreateTaskCommand) (domain.TaskID, error) {
-	id := domain.TaskID(strconv.FormatInt(time.Now().UTC().UnixNano(), 10))
+	id := h.idGen.NewID()
 	task := domain.NewTask(id)
 
 	if err := h.repo.Save(ctx, task); err != nil {

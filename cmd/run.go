@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	myhttp "task-manager/internal/adapter/inbound/http"
+	"task-manager/internal/adapter/outbound/idgen"
 	"task-manager/internal/adapter/outbound/memstore"
 	"task-manager/internal/application/service"
 	"task-manager/internal/common/logger"
@@ -12,10 +13,13 @@ import (
 
 func Run() {
 	logger.Init(os.Stdout)
+
 	repo := memstore.NewTaskRepository()
 	scheduler := memstore.NewTaskScheduler(repo)
 
-	createH := service.NewCreateTaskHandler(repo, scheduler)
+	uuidGen := idgen.NewUUIDGenerator()
+
+	createH := service.NewCreateTaskHandler(repo, scheduler, uuidGen)
 	getH := service.NewGetTaskHandler(repo)
 	deleteH := service.NewDeleteTaskHandler(repo, scheduler)
 	listH := service.NewListTasksHandler(repo)
