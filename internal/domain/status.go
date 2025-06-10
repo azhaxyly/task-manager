@@ -1,5 +1,7 @@
 package domain
 
+import "fmt"
+
 type Status string
 
 const (
@@ -29,4 +31,30 @@ func (s Status) IsValid() bool {
 		return true
 	}
 	return false
+}
+
+func ParseStatus(raw string) (Status, error) {
+	s := Status(raw)
+	if !s.IsValid() {
+		return "", fmt.Errorf("invalid status value: %q", raw)
+	}
+	return s, nil
+}
+
+func (s Status) IsTerminal() bool {
+	return s == Success || s == Failed || s == Canceled
+}
+
+func (s Status) String() string {
+	if !s.IsValid() {
+		return "unknown"
+	}
+	return string(s)
+}
+
+func (s Status) MarshalJSON() ([]byte, error) {
+	if !s.IsValid() {
+		return []byte(`"unknown"`), nil
+	}
+	return []byte(fmt.Sprintf(`"%s"`, s)), nil
 }
