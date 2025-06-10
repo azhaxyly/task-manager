@@ -31,7 +31,7 @@ func NewTaskHandler(
 	}
 }
 
-func (h *TaskHandler) handleTasks(w http.ResponseWriter, r *http.Request) {
+func (h *TaskHandler) HandleTasks(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	start := time.Now()
@@ -50,7 +50,7 @@ func (h *TaskHandler) handleTasks(w http.ResponseWriter, r *http.Request) {
 	logger.Info("Handled %s %s in %v", r.Method, r.URL.Path, elapsed)
 }
 
-func (h *TaskHandler) handleTaskByID(w http.ResponseWriter, r *http.Request) {
+func (h *TaskHandler) HandleTaskByID(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	start := time.Now()
