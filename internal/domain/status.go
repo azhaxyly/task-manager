@@ -25,6 +25,7 @@ var AllStatuses = []Status{
 	Canceled,
 }
 
+// так и не использованы, на будущее
 func (s Status) IsValid() bool {
 	switch s {
 	case Pending, Running, Success, Failed, Canceled:

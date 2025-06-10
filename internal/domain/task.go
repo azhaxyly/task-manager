@@ -46,6 +46,7 @@ func (t *Task) Complete(result string) error {
 	return nil
 }
 
+// пока не используется, на будущее
 func (t *Task) Fail(err error) error {
 	if t.Status != Running {
 		return errors.New("task can't fail, status isn't 'running'")
@@ -70,6 +71,7 @@ func (t *Task) Cancel() error {
 	return nil
 }
 
+// в наносеках
 func (t *Task) Duration() time.Duration {
 	if t.StartedAt == nil {
 		return 0
