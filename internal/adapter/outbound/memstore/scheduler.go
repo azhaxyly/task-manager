@@ -65,3 +65,13 @@ func (s *TaskScheduler) Schedule(_ context.Context, id domain.TaskID) {
 		s.mu.Unlock()
 	}()
 }
+
+func (s *TaskScheduler) Cancel(_ context.Context, id domain.TaskID) {
+	s.mu.Lock()
+	cancel, ok := s.cancelFuncs[id]
+	s.mu.Unlock()
+
+	if ok {
+		cancel()
+	}
+}

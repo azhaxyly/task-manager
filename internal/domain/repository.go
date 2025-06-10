@@ -10,5 +10,5 @@ type TaskRepository interface {
 	Find(ctx context.Context, id TaskID) (*Task, error)
 
 	// удаялет таску
-	// Delete(ctx context.Context, id TaskID) error
+	Delete(ctx context.Context, id TaskID) error
 }

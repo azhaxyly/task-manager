@@ -63,9 +63,19 @@ func NewDeleteTaskHandler(repo out.TaskRepository, scheduler out.TaskScheduler) 
 }
 
 func (h *DeleteTaskHandler) Handle(ctx context.Context, cmd in.DeleteTaskCommand) error {
-	_, err := h.repo.Find(ctx, cmd.ID)
+	t, err := h.repo.Find(ctx, cmd.ID)
 	if err != nil {
 		return err
 	}
-	return h.repo.Delete(ctx, cmd.ID)
+
+	switch t.Status {
+	case domain.Pending, domain.Running:
+		h.scheduler.Cancel(ctx, cmd.ID)
+		if err2 := t.Cancel(); err2 != nil {
+			return err2
+		}
+		return h.repo.Save(ctx, t)
+	default:
+		return h.repo.Delete(ctx, cmd.ID)
+	}
 }
