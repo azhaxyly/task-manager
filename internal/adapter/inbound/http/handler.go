@@ -1,6 +1,9 @@
 package http
 
-import "task-manager/internal/application/port/in"
+import (
+	"net/http"
+	"task-manager/internal/application/port/in"
+)
 
 type TaskHandler struct {
 	create in.CreateTaskUseCase
@@ -14,4 +17,12 @@ func NewTaskHandler(
 	delete in.DeleteTaskUseCase,
 ) *TaskHandler {
 	return &TaskHandler{create: create, get: get, delete: delete}
+}
+
+func (h *TaskHandler) handleTasks(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	if r.Method != http.MethodPost {
+		http.Error(w, `{"error":"method not allowed"}`, http.StatusMethodNotAllowed)
+		return
+	}
 }
