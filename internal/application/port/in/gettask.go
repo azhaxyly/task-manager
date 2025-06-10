@@ -21,5 +21,4 @@ type TaskDTO struct {
 
 type GetTaskUseCase interface {
 	Handle(ctx context.Context, q GetTaskQuery) (TaskDTO, error)
-	Validate(q GetTaskQuery) error
 }
