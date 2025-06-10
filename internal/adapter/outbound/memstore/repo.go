@@ -17,7 +17,12 @@ func NewTaskRepository() *TaskRepository {
 	}
 }
 
-func (r *TaskRepository) Save(ctx context.Context, task *domain.Task) error
+func (r *TaskRepository) Save(ctx context.Context, t *domain.Task) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.data[t.ID] = t
+	return nil
+}
 
 func (r *TaskRepository) Find(ctx context.Context, id domain.TaskID) (*domain.Task, error)
 
