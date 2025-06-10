@@ -2,7 +2,6 @@ package memstore
 
 import (
 	"context"
-	"errors"
 	"sync"
 	"task-manager/internal/domain"
 )
@@ -31,7 +30,7 @@ func (r *TaskRepository) Find(ctx context.Context, id domain.TaskID) (*domain.Ta
 
 	original, ok := r.data[id]
 	if !ok {
-		return nil, errors.New("task not found")
+		return nil, domain.ErrTaskNotFound
 	}
 	return cloneTask(original), nil
 }
@@ -41,7 +40,7 @@ func (r *TaskRepository) Delete(ctx context.Context, id domain.TaskID) error {
 	defer r.mu.Unlock()
 
 	if _, ok := r.data[id]; !ok {
-		return errors.New("task not found")
+		return domain.ErrTaskNotFound
 	}
 	delete(r.data, id)
 	return nil

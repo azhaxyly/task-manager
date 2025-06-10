@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strings"
 	"task-manager/internal/application/port/in"
-	"task-manager/internal/common/errors"
 	"task-manager/internal/common/logger"
 	"task-manager/internal/domain"
 	"time"
@@ -94,7 +93,7 @@ func (h *TaskHandler) handleCreate(w http.ResponseWriter, r *http.Request) {
 func (h *TaskHandler) handleGet(w http.ResponseWriter, r *http.Request, id domain.TaskID) {
 	dto, err := h.get.Handle(r.Context(), in.GetTaskQuery{ID: id})
 	if err != nil {
-		if err == errors.ErrTaskNotFound {
+		if err == domain.ErrTaskNotFound {
 			http.Error(w, `{"error":"task not found"}`, http.StatusNotFound)
 		} else {
 			http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusInternalServerError)
@@ -109,7 +108,7 @@ func (h *TaskHandler) handleGet(w http.ResponseWriter, r *http.Request, id domai
 func (h *TaskHandler) handleDelete(w http.ResponseWriter, r *http.Request, id domain.TaskID) {
 	err := h.delete.Handle(r.Context(), in.DeleteTaskCommand{ID: id})
 	if err != nil {
-		if err == errors.ErrTaskNotFound {
+		if err == domain.ErrTaskNotFound {
 			http.Error(w, `{"error":"task not found"}`, http.StatusNotFound)
 		} else {
 			http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusInternalServerError)

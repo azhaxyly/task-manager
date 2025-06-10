@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+var ErrTaskNotFound = errors.New("task not found")
+
 type TaskID string
 
 type Task struct {
