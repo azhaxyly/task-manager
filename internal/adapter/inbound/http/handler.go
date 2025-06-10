@@ -31,11 +31,13 @@ func NewTaskHandler(
 		list,
 	}
 }
+
 func (h *TaskHandler) handleTasks(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	start := time.Now()
 	logger.Info("Incoming %s %s", r.Method, r.URL.Path)
+
 	switch r.Method {
 	case http.MethodPost:
 		h.handleCreate(w, r)
@@ -44,7 +46,9 @@ func (h *TaskHandler) handleTasks(w http.ResponseWriter, r *http.Request) {
 	default:
 		http.Error(w, `{"error":"method not allowed"}`, http.StatusMethodNotAllowed)
 	}
-	logger.Info("Handled %s %s in %s", r.Method, r.URL.Path, time.Since(start))
+
+	elapsed := time.Since(start)
+	logger.Info("Handled %s %s in %v", r.Method, r.URL.Path, elapsed)
 }
 
 func (h *TaskHandler) handleTaskByID(w http.ResponseWriter, r *http.Request) {
@@ -67,7 +71,9 @@ func (h *TaskHandler) handleTaskByID(w http.ResponseWriter, r *http.Request) {
 	default:
 		http.Error(w, `{"error":"method not allowed"}`, http.StatusMethodNotAllowed)
 	}
-	logger.Info("Handled %s %s in %s", r.Method, r.URL.Path, time.Since(start))
+
+	elapsed := time.Since(start)
+	logger.Info("Handled %s %s in %v", r.Method, r.URL.Path, elapsed)
 }
 
 func (h *TaskHandler) handleCreate(w http.ResponseWriter, r *http.Request) {

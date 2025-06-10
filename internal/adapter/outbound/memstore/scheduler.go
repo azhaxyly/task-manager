@@ -44,7 +44,9 @@ func (s *TaskScheduler) Schedule(_ context.Context, id domain.TaskID) {
 		}
 		s.repo.Save(ctxTask, task)
 
+		// имитация задержки
 		delay := time.Duration(s.rng.Intn(3))*time.Minute + 3*time.Minute
+
 		select {
 		case <-time.After(delay):
 			t2, err := s.repo.Find(ctxTask, id)
