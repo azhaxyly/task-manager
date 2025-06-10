@@ -47,6 +47,17 @@ func (r *TaskRepository) Delete(ctx context.Context, id domain.TaskID) error {
 	return nil
 }
 
+func (r *TaskRepository) List(ctx context.Context) ([]domain.TaskID, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	ids := make([]domain.TaskID, 0, len(r.data))
+	for id := range r.data {
+		ids = append(ids, id)
+	}
+	return ids, nil
+}
+
 func cloneTask(t *domain.Task) *domain.Task {
 	c := *t
 

@@ -6,6 +6,7 @@ import (
 	"strings"
 	"task-manager/internal/application/port/in"
 	"task-manager/internal/domain"
+	"time"
 
 	"errors"
 )
@@ -14,38 +15,52 @@ type TaskHandler struct {
 	create in.CreateTaskUseCase
 	get    in.GetTaskUseCase
 	delete in.DeleteTaskUseCase
+	list   in.ListTasksUseCase
 }
 
 func NewTaskHandler(
 	create in.CreateTaskUseCase,
 	get in.GetTaskUseCase,
 	delete in.DeleteTaskUseCase,
+	list in.ListTasksUseCase,
 ) *TaskHandler {
 	return &TaskHandler{
-		create: create,
-		get:    get,
-		delete: delete,
+		create,
+		get,
+		delete,
+		list,
 	}
 }
 
 func (h *TaskHandler) handleTasks(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	if r.Method != http.MethodPost {
+
+	switch r.Method {
+	case http.MethodPost:
+		id, err := h.create.Handle(r.Context(), in.CreateTaskCommand{})
+		if err != nil {
+			http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusInternalServerError)
+			return
+		}
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"id":        id,
+			"status":    domain.Pending,
+			"createdAt": time.Now().UTC(),
+		})
+
+	case http.MethodGet:
+		tasks, err := h.list.Handle(r.Context(), in.ListTasksQuery{})
+		if err != nil {
+			http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusInternalServerError)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(tasks)
+
+	default:
 		http.Error(w, `{"error":"method not allowed"}`, http.StatusMethodNotAllowed)
-		return
 	}
-
-	id, err := h.create.Handle(r.Context(), in.CreateTaskCommand{})
-	if err != nil {
-		http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"id":     id,
-		"status": domain.Pending,
-	})
 }
 
 func (h *TaskHandler) handleTaskByID(w http.ResponseWriter, r *http.Request) {
@@ -94,4 +109,15 @@ func (h *TaskHandler) handleDelete(w http.ResponseWriter, r *http.Request, id do
 	}
 
 	w.WriteHeader(http.StatusNoContent)
+}
+
+func (h *TaskHandler) handleList(w http.ResponseWriter, r *http.Request) {
+	ids, err := h.list.Handle(r.Context(), in.ListTasksQuery{})
+	if err != nil {
+		http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(ids)
 }

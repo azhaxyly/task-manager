@@ -11,4 +11,7 @@ type TaskRepository interface {
 
 	// удаялет таску
 	Delete(ctx context.Context, id TaskID) error
+
+	// выводит все таски
+	List(ctx context.Context) ([]TaskID, error)
 }
