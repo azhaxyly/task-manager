@@ -8,7 +8,7 @@ import (
 
 func Run() {
 	task := domain.NewTask("xaxaxax")
-	if err := task.Start(); err != nil {
+	if err := task.Complete("completed"); err != nil {
 		fmt.Printf("Error starting task: %v\n", err)
 		return
 	}
