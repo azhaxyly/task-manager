@@ -1,6 +1,9 @@
 package domain
 
-import "time"
+import (
+	"errors"
+	"time"
+)
 
 type TaskID string
 
@@ -20,4 +23,14 @@ func NewTask(id TaskID) *Task {
 		CreatedAt: time.Now().UTC(),
 		Status:    Pending,
 	}
+}
+
+func (t *Task) Start() error {
+	if t.Status != Pending {
+		return errors.New("task can't start, status isn't 'pending'")
+	}
+	now := time.Now().UTC()
+	t.StartedAt = &now
+	t.Status = Running
+	return nil
 }
