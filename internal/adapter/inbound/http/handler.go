@@ -6,22 +6,24 @@ import (
 	"strings"
 	"task-manager/internal/application/port/in"
 	"task-manager/internal/domain"
+
+	"errors"
 )
 
 type TaskHandler struct {
 	create in.CreateTaskUseCase
-	// get    in.GetTaskUseCase
+	get    in.GetTaskUseCase
 	// delete in.DeleteTaskUseCase
 }
 
 func NewTaskHandler(
 	create in.CreateTaskUseCase,
-	// get in.GetTaskUseCase,
+	get in.GetTaskUseCase,
 	// delete in.DeleteTaskUseCase,
 ) *TaskHandler {
 	return &TaskHandler{
 		create: create,
-		// get: get,
+		get:    get,
 		// delete: delete,
 	}
 }
@@ -65,6 +67,19 @@ func (h *TaskHandler) handleTaskByID(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *TaskHandler) handleGet(w http.ResponseWriter, r *http.Request, id domain.TaskID) {}
+func (h *TaskHandler) handleGet(w http.ResponseWriter, r *http.Request, id domain.TaskID) {
+	dto, err := h.get.Handle(r.Context(), in.GetTaskQuery{ID: id})
+	if err != nil {
+		if err == errors.New("task not found") {
+			http.Error(w, `{"error":"task not found"}`, http.StatusNotFound)
+		} else {
+			http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusInternalServerError)
+		}
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(dto)
+}
 
 func (h *TaskHandler) handleDelete(w http.ResponseWriter, r *http.Request, id domain.TaskID) {}

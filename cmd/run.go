@@ -13,8 +13,9 @@ func Run() {
 	scheduler := memstore.NewTaskScheduler(repo)
 
 	createHandler := service.NewCreateTaskHandler(repo, scheduler)
+	getHandler := service.NewGetTaskHandler(repo)
 
-	taskHandler := myhttp.NewTaskHandler(createHandler)
+	taskHandler := myhttp.NewTaskHandler(createHandler, getHandler)
 
 	mux := myhttp.NewRouter(taskHandler)
 
