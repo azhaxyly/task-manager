@@ -1,4 +1,4 @@
-package cmd
+package main
 
 import (
 	"log"
@@ -11,7 +11,7 @@ import (
 	"task-manager/internal/common/logger"
 )
 
-func Run() {
+func main() {
 	logger.Init(os.Stdout)
 
 	repo := memstore.NewTaskRepository()
