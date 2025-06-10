@@ -52,3 +52,20 @@ func (h *GetTaskHandler) Handle(ctx context.Context, q in.GetTaskQuery) (in.Task
 		Error:     t.Err,
 	}, nil
 }
+
+type DeleteTaskHandler struct {
+	repo      out.TaskRepository
+	scheduler out.TaskScheduler
+}
+
+func NewDeleteTaskHandler(repo out.TaskRepository, scheduler out.TaskScheduler) *DeleteTaskHandler {
+	return &DeleteTaskHandler{repo: repo, scheduler: scheduler}
+}
+
+func (h *DeleteTaskHandler) Handle(ctx context.Context, cmd in.DeleteTaskCommand) error {
+	_, err := h.repo.Find(ctx, cmd.ID)
+	if err != nil {
+		return err
+	}
+	return h.repo.Delete(ctx, cmd.ID)
+}

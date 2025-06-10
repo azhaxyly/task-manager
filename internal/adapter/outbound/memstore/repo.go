@@ -37,7 +37,16 @@ func (r *TaskRepository) Find(ctx context.Context, id domain.TaskID) (*domain.Ta
 	return cloneTask(original), nil
 }
 
-// func (r *TaskRepository) Delete(ctx context.Context, id domain.TaskID) error
+func (r *TaskRepository) Delete(ctx context.Context, id domain.TaskID) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	if _, ok := r.data[id]; !ok {
+		return errors.New("task not found")
+	}
+	delete(r.data, id)
+	return nil
+}
 
 // TODO: нужно доделать
 func cloneTask(t *domain.Task) *domain.Task {

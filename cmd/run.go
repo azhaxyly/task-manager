@@ -14,8 +14,9 @@ func Run() {
 
 	createHandler := service.NewCreateTaskHandler(repo, scheduler)
 	getHandler := service.NewGetTaskHandler(repo)
+	deleteHandler := service.NewDeleteTaskHandler(repo, scheduler)
 
-	taskHandler := myhttp.NewTaskHandler(createHandler, getHandler)
+	taskHandler := myhttp.NewTaskHandler(createHandler, getHandler, deleteHandler)
 
 	mux := myhttp.NewRouter(taskHandler)
 
