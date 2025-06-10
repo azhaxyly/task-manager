@@ -2,6 +2,7 @@ package memstore
 
 import (
 	"context"
+	"errors"
 	"sync"
 	"task-manager/internal/domain"
 )
@@ -24,6 +25,16 @@ func (r *TaskRepository) Save(ctx context.Context, t *domain.Task) error {
 	return nil
 }
 
-func (r *TaskRepository) Find(ctx context.Context, id domain.TaskID) (*domain.Task, error)
+func (r *TaskRepository) Find(ctx context.Context, id domain.TaskID) (*domain.Task, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	original, ok := r.data[id]
+	if !ok {
+		return nil, errors.New("task not found")
+	}
+	// TODO: всеравно нужно делать копию, чтобы не было дата рейса
+	return original, nil
+}
 
 func (r *TaskRepository) Delete(ctx context.Context, id domain.TaskID) error

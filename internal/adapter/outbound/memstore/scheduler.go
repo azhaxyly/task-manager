@@ -21,11 +21,20 @@ func NewTaskScheduler(repo out.TaskRepository) *TaskScheduler {
 }
 
 func (s *TaskScheduler) Schedule(_ context.Context, id domain.TaskID) {
-	_, cancel := context.WithCancel(context.Background())
+	ctxTask, cancel := context.WithCancel(context.Background())
 
 	s.mu.Lock()
 	s.cancelFuncs[id] = cancel
 	s.mu.Unlock()
 
-	// TODO: заебашить горутину
+	go func() {
+		task, err := s.repo.Find(ctxTask, id)
+		if err != nil {
+			return
+		}
+		if err := task.Start(); err != nil {
+			return
+		}
+		s.repo.Save(ctxTask, task)
+	}()
 }
