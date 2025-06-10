@@ -10,8 +10,4 @@ type TaskScheduler interface {
 	Schedule(ctx context.Context, id domain.TaskID)
 	// стопит планировщика
 	Cancel(ctx context.Context, id domain.TaskID)
-	// перезапуск с таймером
-	Reschedule(ctx context.Context, id domain.TaskID, newTime int64)
-	// гет всех запланированных тасок
-	GetScheduledTasks(ctx context.Context) ([]domain.Task, error)
 }
