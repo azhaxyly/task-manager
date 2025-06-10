@@ -5,10 +5,9 @@ import (
 	"net/http"
 	"strings"
 	"task-manager/internal/application/port/in"
+	"task-manager/internal/common/errors"
 	"task-manager/internal/domain"
 	"time"
-
-	"errors"
 )
 
 type TaskHandler struct {
@@ -31,33 +30,14 @@ func NewTaskHandler(
 		list,
 	}
 }
-
 func (h *TaskHandler) handleTasks(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	switch r.Method {
 	case http.MethodPost:
-		id, err := h.create.Handle(r.Context(), in.CreateTaskCommand{})
-		if err != nil {
-			http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusInternalServerError)
-			return
-		}
-		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"id":        id,
-			"status":    domain.Pending,
-			"createdAt": time.Now().UTC(),
-		})
-
+		h.handleCreate(w, r)
 	case http.MethodGet:
-		tasks, err := h.list.Handle(r.Context(), in.ListTasksQuery{})
-		if err != nil {
-			http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusInternalServerError)
-			return
-		}
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(tasks)
-
+		h.handleList(w, r)
 	default:
 		http.Error(w, `{"error":"method not allowed"}`, http.StatusMethodNotAllowed)
 	}
@@ -82,10 +62,25 @@ func (h *TaskHandler) handleTaskByID(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (h *TaskHandler) handleCreate(w http.ResponseWriter, r *http.Request) {
+	id, err := h.create.Handle(r.Context(), in.CreateTaskCommand{})
+	if err != nil {
+		http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"id":        id,
+		"status":    domain.Pending,
+		"createdAt": time.Now().UTC(),
+	})
+}
+
 func (h *TaskHandler) handleGet(w http.ResponseWriter, r *http.Request, id domain.TaskID) {
 	dto, err := h.get.Handle(r.Context(), in.GetTaskQuery{ID: id})
 	if err != nil {
-		if err == errors.New("task not found") {
+		if err == errors.ErrTaskNotFound {
 			http.Error(w, `{"error":"task not found"}`, http.StatusNotFound)
 		} else {
 			http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusInternalServerError)
@@ -100,7 +95,7 @@ func (h *TaskHandler) handleGet(w http.ResponseWriter, r *http.Request, id domai
 func (h *TaskHandler) handleDelete(w http.ResponseWriter, r *http.Request, id domain.TaskID) {
 	err := h.delete.Handle(r.Context(), in.DeleteTaskCommand{ID: id})
 	if err != nil {
-		if err == errors.New("task not found") {
+		if err == errors.ErrTaskNotFound {
 			http.Error(w, `{"error":"task not found"}`, http.StatusNotFound)
 		} else {
 			http.Error(w, `{"error":"`+err.Error()+`"}`, http.StatusInternalServerError)

@@ -48,7 +48,7 @@ func (s *TaskScheduler) Schedule(_ context.Context, id domain.TaskID) {
 			if err != nil {
 				return
 			}
-			_ = t2.Complete("completed")
+			_ = t2.Complete(string(domain.Success))
 			s.repo.Save(ctxTask, t2)
 
 		case <-ctxTask.Done():
