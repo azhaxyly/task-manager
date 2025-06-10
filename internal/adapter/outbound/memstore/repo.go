@@ -34,7 +34,31 @@ func (r *TaskRepository) Find(ctx context.Context, id domain.TaskID) (*domain.Ta
 		return nil, errors.New("task not found")
 	}
 	// TODO: всеравно нужно делать копию, чтобы не было дата рейса
-	return original, nil
+	return cloneTask(original), nil
 }
 
 func (r *TaskRepository) Delete(ctx context.Context, id domain.TaskID) error
+
+// TODO: нужно доделать
+func cloneTask(t *domain.Task) *domain.Task {
+	c := *t
+
+	if t.StartedAt != nil {
+		temp := *t.StartedAt
+		c.StartedAt = &temp
+	}
+	if t.FinishedAt != nil {
+		temp := *t.FinishedAt
+		c.FinishedAt = &temp
+	}
+	if t.Result != nil {
+		temp := *t.Result
+		c.Result = &temp
+	}
+	if t.Err != nil {
+		temp := *t.Err
+		c.Err = &temp
+	}
+
+	return &c
+}

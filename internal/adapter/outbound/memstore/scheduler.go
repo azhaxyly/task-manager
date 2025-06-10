@@ -2,12 +2,15 @@ package memstore
 
 import (
 	"context"
+	"math/rand"
 	"sync"
 	"task-manager/internal/application/port/out"
 	"task-manager/internal/domain"
+	"time"
 )
 
 type TaskScheduler struct {
+	rng         *rand.Rand
 	repo        out.TaskRepository
 	mu          sync.Mutex
 	cancelFuncs map[domain.TaskID]context.CancelFunc
@@ -15,6 +18,7 @@ type TaskScheduler struct {
 
 func NewTaskScheduler(repo out.TaskRepository) *TaskScheduler {
 	return &TaskScheduler{
+		rng:         rand.New(rand.NewSource(time.Now().UnixNano())),
 		repo:        repo,
 		cancelFuncs: make(map[domain.TaskID]context.CancelFunc),
 	}
@@ -36,5 +40,28 @@ func (s *TaskScheduler) Schedule(_ context.Context, id domain.TaskID) {
 			return
 		}
 		s.repo.Save(ctxTask, task)
+
+		delay := time.Duration(s.rng.Intn(3))*time.Minute + 3*time.Minute
+		select {
+		case <-time.After(delay):
+			t2, err := s.repo.Find(ctxTask, id)
+			if err != nil {
+				return
+			}
+			_ = t2.Complete("completed")
+			s.repo.Save(ctxTask, t2)
+
+		case <-ctxTask.Done():
+			t2, err := s.repo.Find(context.Background(), id)
+			if err != nil {
+				return
+			}
+			_ = t2.Cancel()
+			s.repo.Save(context.Background(), t2)
+		}
+
+		s.mu.Lock()
+		delete(s.cancelFuncs, id)
+		s.mu.Unlock()
 	}()
 }
