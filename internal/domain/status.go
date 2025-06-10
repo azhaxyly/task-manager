@@ -44,17 +44,3 @@ func ParseStatus(raw string) (Status, error) {
 func (s Status) IsTerminal() bool {
 	return s == Success || s == Failed || s == Canceled
 }
-
-func (s Status) String() string {
-	if !s.IsValid() {
-		return "unknown"
-	}
-	return string(s)
-}
-
-func (s Status) MarshalJSON() ([]byte, error) {
-	if !s.IsValid() {
-		return []byte(`"unknown"`), nil
-	}
-	return []byte(fmt.Sprintf(`"%s"`, s)), nil
-}
