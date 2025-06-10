@@ -9,16 +9,20 @@ import (
 
 type TaskHandler struct {
 	create in.CreateTaskUseCase
-	get    in.GetTaskUseCase
-	delete in.DeleteTaskUseCase
+	// get    in.GetTaskUseCase
+	// delete in.DeleteTaskUseCase
 }
 
 func NewTaskHandler(
 	create in.CreateTaskUseCase,
-	get in.GetTaskUseCase,
-	delete in.DeleteTaskUseCase,
+	// get in.GetTaskUseCase,
+	// delete in.DeleteTaskUseCase,
 ) *TaskHandler {
-	return &TaskHandler{create: create, get: get, delete: delete}
+	return &TaskHandler{
+		create: create,
+		// get: get,
+		// delete: delete,
+	}
 }
 
 func (h *TaskHandler) handleTasks(w http.ResponseWriter, r *http.Request) {

@@ -4,7 +4,7 @@ import "net/http"
 
 // RegisterRoutes регистрирует эндпоинты в mux.
 func (h *TaskHandler) RegisterRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("/tasks", h.handleTasks) // POST /tasks - создать таску
+	mux.HandleFunc("/tasks", h.handleTasks) // POST /tasks - создать таску  ***РАБОТАЕТ***
 	// GET /tasks/{id} - получить таску по айди
 	// DELETE /tasks/{id} - удалить таску по айди
 }
