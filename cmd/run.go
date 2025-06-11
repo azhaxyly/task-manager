@@ -34,7 +34,7 @@ func Run() {
 
 	mux.HandleFunc("/swagger/", httpSwagger.WrapHandler)
 
-	log.Println("Starting server on :8080")
+	logger.Info("Starting server on :8080")
 	if err := http.ListenAndServe(":8080", mux); err != nil {
 		log.Fatal(err)
 	}
