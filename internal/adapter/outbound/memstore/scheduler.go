@@ -4,10 +4,11 @@ import (
 	"context"
 	"math/rand"
 	"sync"
+	"time"
+
 	"task-manager/internal/application/port/out"
 	"task-manager/internal/common/logger"
 	"task-manager/internal/domain"
-	"time"
 )
 
 type TaskScheduler struct {

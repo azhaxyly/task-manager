@@ -2,8 +2,9 @@ package in
 
 import (
 	"context"
-	"task-manager/internal/domain"
 	"time"
+
+	"task-manager/internal/domain"
 )
 
 type ListTasksQuery struct{}

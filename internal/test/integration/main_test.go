@@ -23,12 +23,14 @@ type ImmediateScheduler struct {
 func NewImmediateScheduler(repo *memstore.TaskRepository) *ImmediateScheduler {
 	return &ImmediateScheduler{repo}
 }
+
 func (s *ImmediateScheduler) Schedule(ctx context.Context, id domain.TaskID) {
 	t, _ := s.repo.Find(ctx, id)
 	_ = t.Start()
 	_ = t.Complete("ok")
 	s.repo.Save(ctx, t)
 }
+
 func (s *ImmediateScheduler) Cancel(ctx context.Context, id domain.TaskID) {
 	t, err := s.repo.Find(ctx, id)
 	if err != nil {

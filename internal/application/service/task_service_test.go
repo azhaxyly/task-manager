@@ -23,6 +23,7 @@ func (r *fakeRepo) Save(ctx context.Context, t *domain.Task) error {
 	r.saved[t.ID] = t
 	return nil
 }
+
 func (r *fakeRepo) Find(ctx context.Context, id domain.TaskID) (*domain.Task, error) {
 	t, ok := r.saved[id]
 	if !ok {
@@ -30,6 +31,7 @@ func (r *fakeRepo) Find(ctx context.Context, id domain.TaskID) (*domain.Task, er
 	}
 	return t, nil
 }
+
 func (r *fakeRepo) Delete(ctx context.Context, id domain.TaskID) error {
 	if _, ok := r.saved[id]; !ok {
 		return domain.ErrTaskNotFound
@@ -38,6 +40,7 @@ func (r *fakeRepo) Delete(ctx context.Context, id domain.TaskID) error {
 	r.deleted = append(r.deleted, id)
 	return nil
 }
+
 func (r *fakeRepo) List(ctx context.Context) ([]domain.TaskID, error) {
 	ids := make([]domain.TaskID, 0, len(r.saved))
 	for id := range r.saved {
@@ -54,9 +57,11 @@ type fakeScheduler struct {
 func newFakeScheduler() *fakeScheduler {
 	return &fakeScheduler{}
 }
+
 func (s *fakeScheduler) Schedule(ctx context.Context, id domain.TaskID) {
 	s.scheduled = append(s.scheduled, id)
 }
+
 func (s *fakeScheduler) Cancel(ctx context.Context, id domain.TaskID) {
 	s.canceled = append(s.canceled, id)
 }
