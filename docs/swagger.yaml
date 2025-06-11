@@ -1,0 +1,158 @@
+definitions:
+  domain.Status:
+    enum:
+    - pending
+    - running
+    - completed
+    - failed
+    - canceled
+    type: string
+    x-enum-varnames:
+    - Pending
+    - Running
+    - Success
+    - Failed
+    - Canceled
+  http.CreateTaskResponse:
+    properties:
+      createdAt:
+        type: string
+      id:
+        type: string
+      status:
+        $ref: '#/definitions/domain.Status'
+    type: object
+  http.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  in.TaskDTO:
+    properties:
+      created_at:
+        type: string
+      duration:
+        type: string
+      error:
+        type: string
+      id:
+        type: string
+      result:
+        type: string
+      status:
+        $ref: '#/definitions/domain.Status'
+    type: object
+  in.TaskSummaryDTO:
+    properties:
+      created_at:
+        type: string
+      duration:
+        type: string
+      id:
+        type: string
+      status:
+        $ref: '#/definitions/domain.Status'
+    type: object
+info:
+  contact: {}
+paths:
+  /tasks:
+    get:
+      description: Возвращает список всех задач с их ID, статусом и временем создания.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/in.TaskSummaryDTO'
+            type: array
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: Получить список задач
+      tags:
+      - задачи
+    post:
+      consumes:
+      - application/json
+      description: Создаёт новую асинхронную задачу и возвращает её идентификатор.
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/http.CreateTaskResponse'
+        "405":
+          description: method not allowed
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: Создать новую задачу
+      tags:
+      - задачи
+  /tasks/{id}:
+    delete:
+      description: Отменяет задачу, если она в статусе pending или running, иначе
+        удаляет её.
+      parameters:
+      - description: ID задачи
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: task not found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: Отменить или удалить задачу
+      tags:
+      - задачи
+    get:
+      description: Возвращает подробную информацию о задаче по её идентификатору.
+      parameters:
+      - description: ID задачи
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/in.TaskDTO'
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: task not found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: internal server error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: Получить задачу по ID
+      tags:
+      - задачи
+swagger: "2.0"

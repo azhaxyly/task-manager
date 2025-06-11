@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"log"
@@ -9,9 +9,13 @@ import (
 	"task-manager/internal/adapter/outbound/memstore"
 	"task-manager/internal/application/service"
 	"task-manager/internal/common/logger"
+
+	_ "task-manager/docs"
+
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
-func main() {
+func Run() {
 	logger.Init(os.Stdout)
 
 	repo := memstore.NewTaskRepository()
@@ -27,6 +31,8 @@ func main() {
 	taskH := myhttp.NewTaskHandler(createH, getH, deleteH, listH)
 
 	mux := myhttp.NewRouter(taskH)
+
+	mux.HandleFunc("/swagger/", httpSwagger.WrapHandler)
 
 	log.Println("Starting server on :8080")
 	if err := http.ListenAndServe(":8080", mux); err != nil {
